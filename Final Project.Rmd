@@ -1,0 +1,226 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-04-20"
+---
+
+```{r setup, include=T}
+
+library(tidyverse)
+library(randomForest)
+library(rfUtilities)
+library(rfPermute)
+library(ggpp)
+library(dplyr)
+
+#########
+RF<-read.csv("/Users/jamesm./Desktop/THT_Data_5082.csv")
+RF<-na.omit(RF)
+
+RF=RF[,c(21,4:13)]
+
+
+set.seed(123)
+richness_rf <- randomForest(RF$Physical.Activity.from.Transportation..Score ~ ., data= RF,importance=TRUE,proximity=TRUE)
+richness_rf
+
+richness_perm <- rf.significance(richness_rf, RF, nperm=99, ntree=501)
+richness_perm
+
+
+set.seed(123)
+richness_rfP<- rfPermute(RF$Physical.Activity.from.Transportation..Score ~ ., data = RF, ntree = 500,
+                         na.action = na.omit, nrep = 99,num.cores = 3)
+
+##
+richness_dat <- importance(richness_rfP, sort.by = NULL, decreasing = TRUE)
+
+#
+richness_dat=as.data.frame(richness_dat)
+
+##########
+richness_dat$group2 <- row.names(richness_dat)
+
+unique(richness_dat$group2)
+#######################
+richness_dat %>%
+  as_tibble(rownames = "names") %>%
+  data.frame() %>%
+  mutate(label = if_else(X.IncMSE.pval < 0.001,"***",
+                         if_else(X.IncMSE.pval <0.01,"**",
+                                 if_else(X.IncMSE.pval<0.05,"*","  "))),
+         X.IncMSE = as.numeric(X.IncMSE)) %>%
+  mutate(group = if_else(label=="ns","In_sig","Sig"),
+         names = forcats::fct_inorder(names)) %>%
+  dplyr::arrange(X.IncMSE)  %>% 
+  ggplot(aes(x = group2, y = X.IncMSE))+
+  geom_bar(fill="tan2",stat = "identity",width=0.6,color="black")+
+  geom_text(aes(y = X.IncMSE + 1,label = label),size=4)+
+  labs(x = "", y = "%IncMSE", title="")+ 
+  theme_classic()+ 
+  #theme_bw()+
+  coord_flip()+
+  ####
+  theme(
+    panel.grid = element_blank(),
+    panel.background =element_blank(),
+    #legend.position = "none",
+    legend.title = element_blank(),
+    legend.text = element_text(color="black", 
+                               size = 10, 
+                               family = "serif",
+                               face = "bold"),
+    axis.title.y = element_text(size = 12, 
+                                family = "serif",  
+                                color = "black",
+                                face = "bold"),
+    axis.title.x = element_text(size = 12, 
+                                family = "serif",  
+                                color = "black",
+                                face = "bold"),
+    axis.text.x = element_text(size = 10, 
+                               family = "serif",  
+                               color = "black",
+                               face = "bold"),
+    axis.text.y = element_text(size = 10, 
+                               family = "serif",  
+                               color = "black",
+                               face = "bold"))
+```
+
+
+```{r setup1, include=T}
+RF<-read.csv("/Users/jamesm./Desktop/THT_Data_5082.csv")
+RF<-na.omit(RF)
+
+RF=RF[,c(21,16:19)]
+
+set.seed(123)
+richness_rf <- randomForest(RF$Physical.Activity.from.Transportation..Score ~ ., data= RF,importance=TRUE,proximity=TRUE)
+richness_rf
+
+richness_perm <- rf.significance(richness_rf, RF, nperm=99, ntree=501)
+richness_perm
+
+
+set.seed(123)
+richness_rfP<- rfPermute(RF$Physical.Activity.from.Transportation..Score ~ ., data = RF, ntree = 500,
+                         na.action = na.omit, nrep = 99,num.cores = 3)
+
+##
+richness_dat <- importance(richness_rfP, sort.by = NULL, decreasing = TRUE)
+
+#
+richness_dat=as.data.frame(richness_dat)
+
+##########
+richness_dat$group2 <- row.names(richness_dat)
+
+unique(richness_dat$group2)
+#######################
+richness_dat %>%
+  as_tibble(rownames = "names") %>%
+  data.frame() %>%
+  mutate(label = if_else(X.IncMSE.pval < 0.001,"***",
+                         if_else(X.IncMSE.pval <0.01,"**",
+                                 if_else(X.IncMSE.pval<0.05,"*","  "))),
+         X.IncMSE = as.numeric(X.IncMSE)) %>%
+  mutate(group = if_else(label=="ns","In_sig","Sig"),
+         names = forcats::fct_inorder(names)) %>%
+  dplyr::arrange(X.IncMSE)  %>% 
+  ggplot(aes(x = group2, y = X.IncMSE))+
+  geom_bar(fill="tan2",stat = "identity",width=0.6,color="black")+
+  geom_text(aes(y = X.IncMSE + 1,label = label),size=4)+
+  labs(x = "", y = "%IncMSE", title="")+ 
+  theme_classic()+ 
+  #theme_bw()+
+  coord_flip()+
+  ####
+  theme(
+    panel.grid = element_blank(),
+    panel.background =element_blank(),
+    #legend.position = "none",
+    legend.title = element_blank(),
+    legend.text = element_text(color="black", 
+                               size = 10, 
+                               family = "serif",
+                               face = "bold"),
+    axis.title.y = element_text(size = 12, 
+                                family = "serif",  
+                                color = "black",
+                                face = "bold"),
+    axis.title.x = element_text(size = 12, 
+                                family = "serif",  
+                                color = "black",
+                                face = "bold"),
+    axis.text.x = element_text(size = 10, 
+                               family = "serif",  
+                               color = "black",
+                               face = "bold"),
+    axis.text.y = element_text(size = 10, 
+                               family = "serif",  
+                               color = "black",
+                               face = "bold"))
+```
+
+```{r cars}
+###################
+
+us_states <- map_data("state")
+election<-read.csv("/Users/jamesm./Desktop/THT_Data_5082.csv")
+us_states_elec <- left_join(us_states, election,by="region")
+
+library(plotly)
+#
+p0 <- ggplot(data = us_states_elec,
+             mapping = aes(x = long, y = lat,
+                           group = group, fill = us_states_elec$Physical.Activity.from.Transportation..Score))+
+  geom_polygon(color = "gray90", size = 0.1) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme(legend.title = element_blank())+
+  scale_fill_gradientn(colours = RColorBrewer::brewer.pal(11, "RdBu"))+
+  labs(title = "Physical Activity from Transportation Score",fill="")+
+  theme_bw()
+
+
+ggplotly(p0)
+
+
+```
+
+
+
+```{r cars2}
+###
+p0 <- ggplot(data = us_states_elec,
+             mapping = aes(x = long, y = lat,
+                           group = group, fill = Commute.Mode.Share...Auto..Raw.Value))+
+  geom_polygon(color = "gray90", size = 0.1) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme(legend.title = element_blank())+
+  scale_fill_gradientn(colours = RColorBrewer::brewer.pal(11, "RdBu"))+
+  labs(title = "Commute Mode.Share Auto Raw Value",fill="")+
+  theme_bw()
+
+
+
+ggplotly(p0)
+```
+
+
+
+```{r cars3}
+####
+p0 <- ggplot(data = us_states_elec,
+             mapping = aes(x = long, y = lat,
+                           group = group, fill = Commute.Mode.Share...Auto..Score))+
+  geom_polygon(color = "gray90", size = 0.1) +
+  coord_map(projection = "albers", lat0 = 39, lat1 = 45) +
+  theme(legend.title = element_blank())+
+  scale_fill_gradientn(colours = RColorBrewer::brewer.pal(11, "RdBu"))+
+  labs(title = "Commute Mode Share Auto Score",fill="")+
+  theme_bw()
+
+
+ggplotly(p0)
+```
