@@ -1,0 +1,12 @@
+name: groupi-transportation_health
+title: groupi-transportation_health
+username: xy2598
+account: xy2598
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11852168
+bundleId: 8536330
+url: https://xy2598.shinyapps.io/groupi-transportation_health/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
